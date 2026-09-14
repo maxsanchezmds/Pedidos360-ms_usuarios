@@ -1,9 +1,9 @@
 import type { PoolConfig } from 'pg'
 
-function requiredDatabaseUrl() {
-  const databaseUrl = process.env.DATABASE_URL
-  if (!databaseUrl) throw new Error('La variable DATABASE_URL no está configurada.')
-  return databaseUrl
+export function assertDatabaseConfigured() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error('La variable DATABASE_URL no está configurada.')
+  }
 }
 
 function sslConfig(): PoolConfig['ssl'] {
@@ -17,8 +17,10 @@ function sslConfig(): PoolConfig['ssl'] {
 }
 
 export function databaseConfig(): PoolConfig {
+  const connectionString = process.env.DATABASE_URL
+
   return {
-    connectionString: requiredDatabaseUrl(),
+    ...(connectionString ? { connectionString } : {}),
     ssl: sslConfig(),
     max: 2,
     connectionTimeoutMillis: 5_000,
@@ -26,4 +28,3 @@ export function databaseConfig(): PoolConfig {
     allowExitOnIdle: true,
   }
 }
-

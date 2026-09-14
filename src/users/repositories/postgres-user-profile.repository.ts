@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { Pool } from 'pg'
 import { PG_POOL } from '../../common/constants/injection-tokens.js'
+import { assertDatabaseConfigured } from '../../database/database.config.js'
 import type {
   SaveUserProfileInput,
   UserProfile,
@@ -30,6 +31,7 @@ export class PostgresUserProfileRepository implements UserProfileRepository {
   constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
   async findById(userId: string) {
+    assertDatabaseConfigured()
     const result = await this.pool.query<UserProfileRow>(
       `SELECT user_id, display_name, address, created_at, updated_at
        FROM user_profiles
@@ -40,6 +42,7 @@ export class PostgresUserProfileRepository implements UserProfileRepository {
   }
 
   async save(input: SaveUserProfileInput) {
+    assertDatabaseConfigured()
     const result = await this.pool.query<UserProfileRow>(
       `INSERT INTO user_profiles (user_id, display_name, address)
        VALUES ($1, $2, $3)

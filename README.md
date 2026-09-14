@@ -41,6 +41,19 @@ independiente de la implementación de persistencia.
 
 ## Endpoints
 
+### `GET /status`
+
+Comprueba que API Gateway puede invocar la Lambda. Es público y no requiere
+Cognito ni una conexión a PostgreSQL.
+
+```json
+{
+  "status": "ok",
+  "service": "users",
+  "timestamp": "2026-09-14T12:00:00.000Z"
+}
+```
+
 ### `GET /users/me`
 
 Devuelve el perfil del usuario autenticado. Responde `404` si todavía no existe.
