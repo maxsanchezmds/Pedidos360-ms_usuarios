@@ -114,3 +114,11 @@ configuración de Lambda. La conexión se adaptará a Secrets Manager cuando se 
 la base de datos. Si PostgreSQL está en una VPC privada, la Lambda también tendrá
 que conectarse a esa VPC y se recomienda usar RDS Proxy para controlar conexiones.
 
+## CI/CD
+
+El workflow `.github/workflows/deploy.yml` se ejecuta al hacer push a `main`, usa
+GitHub OIDC para obtener credenciales temporales y actualiza el ZIP de una Lambda
+existente. No crea ni modifica infraestructura adicional.
+
+La preparación manual de GitHub, IAM, Lambda, PostgreSQL y API Gateway está en
+[`docs/deployment.md`](docs/deployment.md).
