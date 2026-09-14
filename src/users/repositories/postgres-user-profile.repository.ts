@@ -1,6 +1,11 @@
+import { Inject, Injectable } from '@nestjs/common'
 import type { Pool } from 'pg'
-import type { SaveUserProfileInput, UserProfile } from '../domain/user-profile'
-import type { UserProfileRepository } from './user-profile-repository'
+import { PG_POOL } from '../../common/constants/injection-tokens.js'
+import type {
+  SaveUserProfileInput,
+  UserProfile,
+} from '../interfaces/user-profile.interface.js'
+import type { UserProfileRepository } from '../interfaces/user-profile-repository.interface.js'
 
 interface UserProfileRow {
   user_id: string
@@ -20,8 +25,9 @@ function toUserProfile(row: UserProfileRow): UserProfile {
   }
 }
 
+@Injectable()
 export class PostgresUserProfileRepository implements UserProfileRepository {
-  constructor(private readonly pool: Pool) {}
+  constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
   async findById(userId: string) {
     const result = await this.pool.query<UserProfileRow>(
@@ -30,7 +36,6 @@ export class PostgresUserProfileRepository implements UserProfileRepository {
        WHERE user_id = $1`,
       [userId],
     )
-
     return result.rows[0] ? toUserProfile(result.rows[0]) : null
   }
 
@@ -45,10 +50,8 @@ export class PostgresUserProfileRepository implements UserProfileRepository {
        RETURNING user_id, display_name, address, created_at, updated_at`,
       [input.userId, input.displayName, input.address],
     )
-
     const profile = result.rows[0]
     if (!profile) throw new Error('PostgreSQL no devolvió el perfil guardado.')
     return toUserProfile(profile)
   }
 }
-

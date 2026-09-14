@@ -1,13 +1,43 @@
 # Pedidos360 · Microservicio de usuarios
 
-Lambda de perfiles de usuario para Pedidos360, implementada con Node.js,
-TypeScript y PostgreSQL.
+Microservicio de perfiles de usuario implementado con NestJS, TypeScript,
+PostgreSQL y AWS Lambda.
 
 ## Responsabilidad
 
 Amazon Cognito sigue siendo la fuente de verdad para email, contraseña, MFA y
 grupos. Este servicio almacena solamente el perfil de negocio. La clave primaria
 `user_id` es el claim `sub` del token validado por API Gateway.
+
+## Estructura
+
+```text
+src/
+├── auth/
+│   ├── decorators/
+│   ├── guards/
+│   └── interfaces/
+├── common/constants/
+├── database/
+├── users/
+│   ├── controllers/
+│   ├── dto/
+│   ├── interfaces/
+│   ├── repositories/
+│   ├── services/
+│   └── users.module.ts
+├── app.module.ts
+├── bootstrap.ts
+├── lambda.ts
+└── main.ts
+test/
+├── users.controller.spec.ts
+└── users.service.spec.ts
+```
+
+El controlador recibe HTTP, el servicio contiene los casos de uso y el
+repositorio encapsula PostgreSQL. Las interfaces mantienen el servicio
+independiente de la implementación de persistencia.
 
 ## Endpoints
 
@@ -27,7 +57,7 @@ Crea o actualiza el perfil del usuario autenticado.
 ```
 
 El cliente no puede enviar `userId`, email ni grupos. El identificador se obtiene
-del authorizer de Cognito.
+del authorizer de Cognito mediante `CognitoAuthGuard`.
 
 ## Desarrollo
 
@@ -38,6 +68,14 @@ npm test
 npm run lint
 npm run build
 ```
+
+Cuando PostgreSQL esté disponible:
+
+```bash
+npm run start:dev
+```
+
+La aplicación HTTP local utiliza el puerto `3000` por defecto.
 
 ## PostgreSQL
 
@@ -50,14 +88,16 @@ La migración es SQL manual y no crea infraestructura AWS.
 
 ## Despliegue en Lambda
 
-`npm run build` genera `dist/index.js`. Al crear la Lambda, el handler será:
+`npm run build` genera `dist/lambda.js` y el resto de la aplicación compilada.
+El handler configurado en Lambda será:
 
 ```text
-index.handler
+dist/lambda.handler
 ```
 
-Antes de empaquetar, coloca `dist/index.js` en la raíz del archivo ZIP. `esbuild`
-incluye las dependencias de ejecución en ese archivo.
+El ZIP deberá conservar `dist/`, `package.json` y las dependencias de producción
+en `node_modules/`. El adaptador `@codegenie/serverless-express` convierte los
+eventos de API Gateway en solicitudes HTTP para los controladores NestJS.
 
 Variables previstas para Lambda:
 
@@ -66,9 +106,10 @@ DATABASE_URL
 DB_SSL=true
 DB_SSL_REJECT_UNAUTHORIZED=true
 DB_SSL_CA=<certificado CA cuando corresponda>
+CORS_ORIGIN=http://localhost:5173
 ```
 
-Para producción, la contraseña no debería quedar escrita directamente en la
+Para producción, la contraseña no debe quedar escrita directamente en la
 configuración de Lambda. La conexión se adaptará a Secrets Manager cuando se cree
 la base de datos. Si PostgreSQL está en una VPC privada, la Lambda también tendrá
 que conectarse a esa VPC y se recomienda usar RDS Proxy para controlar conexiones.

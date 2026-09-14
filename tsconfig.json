@@ -10,9 +10,11 @@
     "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noEmit": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "outDir": "./dist",
     "types": ["node", "aws-lambda", "vitest/globals"]
   },
   "include": ["src", "tests"]
 }
-
