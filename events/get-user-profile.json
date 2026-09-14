@@ -1,0 +1,24 @@
+{
+  "resource": "/users/me",
+  "path": "/users/me",
+  "httpMethod": "GET",
+  "headers": {},
+  "multiValueHeaders": {},
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "resourcePath": "/users/me",
+    "httpMethod": "GET",
+    "authorizer": {
+      "claims": {
+        "sub": "00000000-0000-0000-0000-000000000001",
+        "cognito:groups": "Customer"
+      }
+    }
+  },
+  "body": null,
+  "isBase64Encoded": false
+}
+

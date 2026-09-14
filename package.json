@@ -1,0 +1,28 @@
+{
+  "name": "pedidos360-users-service",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/handler.ts --bundle --platform=node --target=node22 --format=cjs --outfile=dist/index.js --sourcemap",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.23.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/aws-lambda": "^8.10.163",
+    "@types/node": "^26.5.1",
+    "@types/pg": "^8.23.1",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.0.0",
+    "globals": "^17.12.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^5.0.0"
+  }
+}

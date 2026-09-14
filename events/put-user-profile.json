@@ -1,0 +1,26 @@
+{
+  "resource": "/users/me",
+  "path": "/users/me",
+  "httpMethod": "PUT",
+  "headers": {
+    "content-type": "application/json"
+  },
+  "multiValueHeaders": {},
+  "queryStringParameters": null,
+  "multiValueQueryStringParameters": null,
+  "pathParameters": null,
+  "stageVariables": null,
+  "requestContext": {
+    "resourcePath": "/users/me",
+    "httpMethod": "PUT",
+    "authorizer": {
+      "claims": {
+        "sub": "00000000-0000-0000-0000-000000000001",
+        "cognito:groups": "Customer"
+      }
+    }
+  },
+  "body": "{\"displayName\":\"Usuario de prueba\",\"address\":\"Santiago\"}",
+  "isBase64Encoded": false
+}
+
