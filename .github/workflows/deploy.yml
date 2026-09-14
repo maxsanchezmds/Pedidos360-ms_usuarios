@@ -72,10 +72,26 @@ jobs:
           ZIP_BYTES=$(stat -c%s users-service.zip)
           MAX_DIRECT_UPLOAD_BYTES=$((50 * 1024 * 1024))
           echo "Deployment package size: ${ZIP_BYTES} bytes"
+
           if [ "${ZIP_BYTES}" -gt "${MAX_DIRECT_UPLOAD_BYTES}" ]; then
             echo "::error::The ZIP exceeds Lambda's 50 MB direct-upload limit"
             exit 1
           fi
+
+      - name: Debug OIDC claims
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+
+            const payload = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64url').toString()
+            );
+
+            console.log('sub:', payload.sub);
+            console.log('aud:', payload.aud);
+            console.log('repository:', payload.repository);
+            console.log('ref:', payload.ref);
 
       - name: Configure AWS credentials with OIDC
         uses: aws-actions/configure-aws-credentials@v6.2.4
@@ -111,6 +127,10 @@ jobs:
             --function-name "${LAMBDA_FUNCTION_NAME}" \
             --query 'LastUpdateStatus' \
             --output text)
-          test "${STATUS}" = "Successful" || { echo "::error::Lambda update status is ${STATUS}"; exit 1; }
-          echo "Lambda deployment completed successfully."
 
+          test "${STATUS}" = "Successful" || {
+            echo "::error::Lambda update status is ${STATUS}"
+            exit 1
+          }
+
+          echo "Lambda deployment completed successfully."
